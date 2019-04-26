@@ -1,0 +1,137 @@
+#!/usr/bin/env node
+
+/** Module dependencies. */
+const app = require('../app');
+const debug = require('debug')('comp1108:server');
+const http = require('http');
+
+/** Get port from environment and store in Express */
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/** Create HTTP server. */
+const server = http.createServer(app);
+
+/** Listen on provided port, on all network interfaces. */
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/** Normalize a port into a number, string, or false. */
+function normalizePort(val) {
+    const port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        return val;
+    }
+
+    if (port >= 0) {
+        return port;
+    }
+
+    return false;
+}
+
+/** Event listener for HTTP server "error" event. */
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(`${bind} requires elevated privileges`);
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(`${bind} is already in use`);
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/** Event listener for HTTP server "listening" event. */
+function onListening() {
+    const addr = server.address();
+    const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
+    debug(`Listening on ${bind}`);
+}
+
+const database = require("../database");
+const io = require('socket.io').listen(server);
+const p2p = require('socket.io-p2p-server').Server;
+
+io.use(p2p);
+
+const getFriends = (user_id) => {
+    const db = database();
+    const sql = "SELECT user_1, user_2 FROM Relationships WHERE (user_1 = ? OR user_2 = ?) AND status = 2;";
+
+    return db.all(sql, [user_id, user_id]).then(rows => {
+        const friends = [];
+        rows.forEach(row => {
+            if (row.user_1 === user_id) {
+                friends.push(row.user_2)
+            } else if (row.user_2 === user_id) {
+                friends.push(row.user_1)
+            }
+        });
+        db.close();
+        return friends;
+    });
+};
+
+let clients = {};
+io.on('connection', socket => {
+    socket.on('come-online', user => {
+        console.log(`User ${user.username} comes online`);
+        clients[user.id] = {
+            socket: socket.id,
+            status: "online",
+            detail: user
+        };
+        getFriends(user.id).then(friends => {
+            const onlineFriends = friends.reduce((arr, f) => {
+                if (clients[f]) arr.push(f);
+                return arr;
+            }, []);
+            socket.emit("online-friends", onlineFriends);
+            const {user_id, avatar, fullname} = user;
+            const data = {user_id, avatar, fullname, status: "online"};
+            onlineFriends.forEach(o => {
+                io.to(`${clients[o]}`).emit("friend-change-status", data);
+            })
+        })
+    });
+
+    socket.on("new-message", data => {
+        console.log(data);
+        const {message, chat_id, user_id, recipients} = data;
+        const time = new Date().getTime();
+        const db = database().getDb();
+        const sql = "INSERT INTO Messages(chat_id, user_id, content, time) VALUES (?, ?, ?, ?)";
+        db.run(sql, [chat_id, user_id, message, time]);
+        io.rooms
+    });
+
+    socket.on('change-status', data => {
+        const {id, status} = data;
+        clients[id].status = status;
+    });
+
+    socket.on("disconnect", () => {
+        for (const c in clients) {
+            if (clients.hasOwnProperty(c) && clients[c].socket === socket.id) {
+                let detail = clients[c].detail;
+
+                delete clients[c];
+                break;
+            }
+        }
+    });
+});

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <title>Sign in</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="/css/login.css" rel="stylesheet">
+</head>
+<body class="text-center">
+<div class="container">
+    <div class="row">
+        <form class="form-signin col-12">
+            <img class="mb-4" src="/images/default_avatar.png" alt="" width="100px" height="100px">
+            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+            <label for="signin-username" class="sr-only">Username</label>
+            <input type="text" id="signin-username" class="form-control" placeholder="Email address" required autofocus>
+            <label for="signin-password" class="sr-only">Password</label>
+            <input type="password" id="signin-password" class="form-control" placeholder="Password" required>
+            <div class="checkbox mb-3">
+                <label><input id="signin-remember" type="checkbox" value="remember-me"> Remember me</label>
+            </div>
+            <button id="btn-signin" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <p><a href="/user/signup">Sign up new account</a> or <a href="/user/recover">recover password</a></p>
+        </form>
+    </div>
+
+    <div id="alert" class="alert alert-danger alert-dismissible fade" role="alert">
+        <span id="error-msg"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script>
+    const error = $("#error-msg");
+    const alert = $("#alert");
+
+    $("#btn-signin").on("click", e => {
+        e.preventDefault();
+        const username = $("#signin-username").val();
+        const password = $("#signin-password").val();
+        const remember = $("#signin-remember").prop("checked");
+        if (!(/^[a-zA-Z]\w{4,}$/).test(username)) {
+            error.html("User name must starts with alphabet character and cannot be shorter than 5 characters!");
+            alert.addClass("show");
+            return;
+        }
+
+        if (password.length < 6) {
+            error.html("Password cannot be shorter than 6 characters!");
+            alert.addClass("show");
+            return;
+        }
+
+        $.ajax({
+            url: "/user/signin",
+            method: "POST",
+            data: {username, password, remember},
+            success: (result, status, xhr) => {
+                try {
+                    const msg = JSON.parse(result).error;
+                    if (msg) {
+                        error.html(msg);
+                        alert.addClass("show");
+                        setTimeout(() => alert.removeClass("show"), 3000);
+                    }
+                } catch (e) {
+                    window.location = "/chat"
+                }
+            }
+        })
+    });
+</script>
+</body>
+</html>
