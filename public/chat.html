@@ -6,10 +6,10 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title class="username"></title>
+    <link rel="stylesheet prefetch" type="text/css" href="css/all.min.css">
+    <link rel="stylesheet prefetch" type="text/css" href="css/SourceSansPro.css">
     <link rel="stylesheet prefetch" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet prefetch" type="text/css" href="css/reset.min.css">
-    <link rel="stylesheet prefetch" type="text/css" href="css/font-awesome.min.css">
-    <link rel="stylesheet prefetch" type="text/css" href="css/SourceSansPro.css">
     <link rel="stylesheet prefetch" type="text/css" href="css/chat.css">
 </head>
 <body>
@@ -22,19 +22,19 @@
                 <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
                 <div id="status-options">
                     <ul>
-                        <li id="status-online" class="active">
+                        <li id="status-online" data-status="online" class="status active">
                             <span class="status-circle"></span>
                             <p>Online</p>
                         </li>
-                        <li id="status-away">
+                        <li id="status-away" data-status="away" class="status">
                             <span class="status-circle"></span>
                             <p>Away</p>
                         </li>
-                        <li id="status-busy">
+                        <li id="status-busy" data-status="busy" class="status">
                             <span class="status-circle"></span>
                             <p>Busy</p>
                         </li>
-                        <li id="status-offline">
+                        <li id="status-offline" data-status="offline" class="status">
                             <span class="status-circle"></span>
                             <p>Offline</p>
                         </li>
@@ -44,11 +44,8 @@
                     <label for="mail"><i class="fa fa-envelope fa-fw" aria-hidden="true"></i></label>
                     <input id="mail" name="facebook" type="text" value="" disabled/>
 
-                    <label for="link-twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
-                    <input id="link-twitter" name="twitter" type="text" value=""/>
-
-                    <label for="link-instagram"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
-                    <input id="link-instagram" name="twitter" type="text" value=""/>
+                    <hr>
+                    <a href="/user/signout" class="btn btn-danger btn-sm btn-block">Sign out</a>
                 </div>
             </div>
         </div>
@@ -72,9 +69,26 @@
         <div class="text-center">
             <br>
             <p class="h1">Hello, <span class="username"></span></p>
-
         </div>
     </div>
+</div>
+<div id="media-call" class="media-call hidden">
+    <video class="userVideo" id="localVideo" playsinline autoplay muted></video>
+    <video class="peerVideo" id="remoteVideo" playsinline autoplay></video>
+    <div class="row">
+        <div class="col group-button text-center">
+            <button id="btn-voice" class="btn btn-secondary btn-circle btn-lg">
+                <i id="ico-voice" class="fa fa-microphone"></i>
+            </button>
+            <button id="btn-video" class="btn btn-primary btn-circle btn-lg">
+                <i id="ico-video" class="fa fa-video"></i>
+            </button>
+            <button id="btn-hangup" class="btn btn-danger btn-circle btn-lg">
+                <i class="fa fa-phone-square"></i>
+            </button>
+        </div>
+    </div>
+
 </div>
 
 <div class="modal fade" id="modal-settings" tabindex="-1" role="dialog" aria-labelledby="modal-settings-title"
@@ -92,7 +106,7 @@
                     <button type="button" class="btn btn-secondary">1</button>
                     <button type="button" class="btn btn-secondary">2</button>
                     <button type="button" class="btn btn-secondary">3</button>
-                    <a href="/user/signout" class="btn btn-danger">Sign out</a>
+
                 </div>
             </div>
         </div>
@@ -109,25 +123,59 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="btn-group-vertical col-12">
+                <div class="input-group">
+                    <input id="txt-search-user" type="text" class="form-control" aria-label="User search"
+                           placeholder="Input some information">
+                    <div class="input-group-append">
+                        <button id="btn-search-user" type="button" class="btn btn-outline-secondary">
+                            <i class="fa fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <ul id="user-results"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-call" tabindex="-1" role="dialog" aria-labelledby="modal-video-title"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-call-title">Call</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12">
+                    <button id="video-call" type="button" class="btn btn-primary btn-lg btn-block">
+                        <i class="fa fa-video"></i> Video Call
+                    </button>
+                    <button id="voice-chat" type="button" class="btn btn-primary btn-lg btn-block">
+                        <i class="fa fa-microphone"></i> Voice Chat
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modal-video" tabindex="-1" role="dialog" aria-labelledby="modal-video-title"
+<div class="modal fade" id="modal-incoming-call" tabindex="-1" role="dialog" aria-labelledby="modal-video-title"
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-video-title">Add contact</h5>
+                <h5 class="modal-title" id="modal-video-title">Incoming Call</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="btn-group-vertical col-12">
-                </div>
+                <p id="call-msg"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btn-decline" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-answer">Answer</button>
             </div>
         </div>
     </div>
@@ -137,7 +185,7 @@
 <script type="text/javascript" src="js/socket.io.js"></script>
 <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="js/PeerConnection.js"></script>
+<script type="text/javascript" src="js/rtc.js"></script>
 <script type="text/javascript" src="js/chat.js"></script>
 </body>
 </html>

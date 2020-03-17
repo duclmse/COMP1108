@@ -65,7 +65,10 @@ function onListening() {
 const database = require("../database");
 const io = require('socket.io').listen(server);
 const p2p = require('socket.io-p2p-server').Server;
+const os = require('os');
 
+const clients = {};
+const calls = {};
 io.use(p2p);
 
 const getFriends = (user_id) => {
@@ -86,49 +89,111 @@ const getFriends = (user_id) => {
     });
 };
 
-let clients = {};
+const notifyStatus = (socket, user, status) => {
+    getFriends(user.id).then(friends => {
+        const onlineFriends = friends.reduce((arr, f) => {
+            if (clients[f]) arr.push(f);
+            return arr;
+        }, []);
+        if (onlineFriends) socket.emit("online-friends", onlineFriends);
+
+        const {id} = user;
+        onlineFriends.forEach(o => {
+            io.to(`${clients[o].socket.id}`).emit("friend-change-status", {id, status});
+        })
+    })
+};
+
 io.on('connection', socket => {
     socket.on('come-online', user => {
         console.log(`User ${user.username} comes online`);
         clients[user.id] = {
-            socket: socket.id,
+            socket: socket,
             status: "online",
             detail: user
         };
-        getFriends(user.id).then(friends => {
-            const onlineFriends = friends.reduce((arr, f) => {
-                if (clients[f]) arr.push(f);
-                return arr;
-            }, []);
-            socket.emit("online-friends", onlineFriends);
-            const {user_id, avatar, fullname} = user;
-            const data = {user_id, avatar, fullname, status: "online"};
-            onlineFriends.forEach(o => {
-                io.to(`${clients[o]}`).emit("friend-change-status", data);
-            })
-        })
+
+        notifyStatus(socket, user, "online")
+    });
+
+    socket.on('change-status', data => {
+        const {id, status} = data;
+        const client = clients[id];
+        client.status = status;
+        notifyStatus(socket, client, status)
     });
 
     socket.on("new-message", data => {
         console.log(data);
         const {message, chat_id, user_id, recipients} = data;
         const time = new Date().getTime();
-        const db = database().getDb();
+        const db = database();
         const sql = "INSERT INTO Messages(chat_id, user_id, content, time) VALUES (?, ?, ?, ?)";
         db.run(sql, [chat_id, user_id, message, time]);
-        io.rooms
+        const update = "UPDATE Chats SET last_update = ? WHERE id = ?";
+        db.run(update, [time, chat_id]);
+
+        let onlineRecipient = false;
+        recipients.forEach(r => {
+            if (clients[r]) {
+                onlineRecipient = true;
+                clients[r].socket.join(chat_id)
+            }
+        });
+        if (onlineRecipient) {
+            socket.join(chat_id);
+            socket.to(chat_id).emit("new_message", {content: message, chat_id, user_id, time});
+        }
+        db.close();
     });
 
-    socket.on('change-status', data => {
-        const {id, status} = data;
-        clients[id].status = status;
+    socket.on("call", data => {
+        const {chat_id, user_id, username, recipients} = data;
+        let onlineRecipient = false;
+        recipients.forEach(r => {
+            if (clients[r]) {
+                onlineRecipient = true;
+                clients[r].socket.join(chat_id)
+            }
+        });
+        calls[chat_id] = {...data, start_id: user_id, inCall: []};
+        console.log(calls);
+        if (onlineRecipient) {
+            socket.join(chat_id);
+            socket.to(chat_id).emit("incoming-call", {chat_id, user_id, username});
+        } else {
+            socket.emit("no-recipients", {})
+        }
+
+    });
+
+    socket.on("answer", data => {
+        console.log(data);
+        const {chat_id, user_id} = data;
+        console.log("answer");
+        console.log(calls);
+        console.log(chat_id);
+        const call = calls[chat_id];
+        call.inCall.push(user_id);
+        clients[call.start_id].socket.emit("answer", {});
+    });
+
+    socket.on("call-end", data => {
+        const {chat_id} = data;
+        calls[chat_id].inCall.forEach(r => {
+            if (clients[r]) {
+                clients[r].socket.emit("call-end", {})
+            }
+        });
+        delete calls[chat_id];
     });
 
     socket.on("disconnect", () => {
         for (const c in clients) {
-            if (clients.hasOwnProperty(c) && clients[c].socket === socket.id) {
+            if (clients.hasOwnProperty(c) && clients[c].socket.id === socket.id) {
                 let detail = clients[c].detail;
-
+                notifyStatus(socket, detail, "offline");
+                console.log(`User ${detail.username} comes offline`);
                 delete clients[c];
                 break;
             }

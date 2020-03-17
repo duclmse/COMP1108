@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const logger = require('morgan');
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 
@@ -28,19 +27,19 @@ app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/chat', chatRouter);
 
-app.use((req, res, next) => {
-    const oldRedirect = res.redirect;
-    res.redirect = function (...args) {
-        if (req.session) {
-            // redirecting after saving...
-            req.session.save(() => Reflect.apply(oldRedirect, this, args))
-        } else {
-            Reflect.apply(oldRedirect, this, args);
-        }
-    }
-});
+// app.use((req, res, next) => {
+//     const oldRedirect = res.redirect;
+//     res.redirect = function (...args) {
+//         if (req.session) {
+//             // redirecting after saving...
+//             req.session.save(() => Reflect.apply(oldRedirect, this, args))
+//         } else {
+//             Reflect.apply(oldRedirect, this, args);
+//         }
+//     }
+// });
 
 let initialization = require("./initialization");
-initialization.importMockData("./resources/db/mock_data.json", './resources/db/comp1108.sqlite');
+initialization.importMockData("./resources/db/mock_data.json");
 
 module.exports = app;

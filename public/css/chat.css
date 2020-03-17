@@ -1,9 +1,9 @@
+/*region normal*/
 body {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: #27ae60;
     font-family: "proxima-nova", "Source Sans Pro", sans-serif;
     font-size: 1em;
     letter-spacing: 0.1px;
@@ -106,7 +106,6 @@ body {
     margin-left: 15px;
 }
 
-
 #frame #sidepanel #profile .wrap i.expand-button {
     float: right;
     margin-top: 23px;
@@ -114,7 +113,6 @@ body {
     cursor: pointer;
     color: #435f7a;
 }
-
 
 #frame #sidepanel #profile .wrap #status-options {
     position: absolute;
@@ -132,13 +130,11 @@ body {
     transition: 0.3s all ease;
 }
 
-
 #frame #sidepanel #profile .wrap #status-options.active {
     opacity: 1;
     visibility: visible;
     margin: 75px 0 0 0;
 }
-
 
 #frame #sidepanel #profile .wrap #status-options:before {
     content: '';
@@ -150,7 +146,6 @@ body {
     border-bottom: 8px solid #435f7a;
     margin: -8px 0 0 24px;
 }
-
 
 #frame #sidepanel #profile .wrap #status-options ul {
     overflow: hidden;
@@ -175,7 +170,6 @@ body {
     margin: 5px 0 0 0;
 }
 
-
 #frame #sidepanel #profile .wrap #status-options ul li span.status-circle:before {
     content: '';
     position: absolute;
@@ -184,7 +178,6 @@ body {
     margin: -2px 0 0 -2px;
     background: transparent;
     border-radius: 50%;
-    z-index: 0;
 }
 
 #frame #sidepanel #profile .wrap #status-options ul li p {
@@ -299,7 +292,6 @@ body {
     overflow-x: hidden;
 }
 
-
 #frame #sidepanel #contacts.expanded {
     height: calc(100% - 334px);
 }
@@ -328,6 +320,10 @@ body {
 #frame #sidepanel #contacts ul li.contact.active {
     background: #32465a;
     border-right: 5px solid #435f7a;
+}
+
+#frame #sidepanel #contacts ul li.contact.new-msg {
+    background: #599aff;
 }
 
 #frame #sidepanel #contacts ul li.contact.active span.contact-status {
@@ -439,8 +435,7 @@ body {
 }
 
 #frame .content {
-    float: right;
-    width: 60%;
+    float: left;
     height: 100%;
     overflow: hidden;
     position: relative;
@@ -563,7 +558,7 @@ body {
     position: absolute;
     bottom: 0;
     width: 100%;
-    z-index: 99;
+    /*z-index: 99;*/
 }
 
 #frame .content .message-input .wrap {
@@ -576,10 +571,8 @@ body {
     border: none;
     width: calc(100% - 100px);
     padding: 11px 32px 10px 8px;
-    /*font-size: 0.8em;*/
     color: #32465a;
 }
-
 
 #frame .content .message-input .wrap input:focus {
     outline: none;
@@ -587,15 +580,14 @@ body {
 
 #frame .content .message-input .wrap .attach {
     position: absolute;
-    z-index: 4;
+    z-index: 99;
     right: 50px;
     font-size: 1.1em;
-    color: white;
-    cursor: pointer;
+    color: #666666;
 }
 
 #frame .content .message-input .wrap .attach:hover {
-    opacity: 1;
+    color: white;
 }
 
 #frame .content .message-input .wrap button {
@@ -608,9 +600,9 @@ body {
 
 #frame .content .message-input .wrap .submit {
     background: #32465a;
+    z-index: 99;
     color: #f5f5f5;
 }
-
 
 #frame .content .message-input .wrap button:hover {
     background: #435f7a;
@@ -620,10 +612,288 @@ body {
     outline: none;
 }
 
-@media screen and (max-width: 735px) {
+/*endregion normal*/
+
+/*region call*/
+#frame.call {
+    width: 40%;
+}
+
+#frame.call #sidepanel {
+    width: 58px;
+    min-width: 58px;
+    transition: all .25s;
+}
+
+#frame.call #sidepanel.hover {
+    min-width: 280px;
+    max-width: 340px;
+    width: 80%;
+}
+
+#frame.call #sidepanel #profile {
+    width: 100%;
+    margin: 0 auto;
+    background: #32465a;
+}
+
+#frame.call #sidepanel #profile .wrap {
+    height: 55px;
+}
+
+#frame.call #sidepanel #profile .wrap img {
+    width: 40px;
+    margin: 9px;
+}
+
+#frame.call #sidepanel #profile .wrap p {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #profile .wrap p {
+    display: block;
+}
+
+#frame.call #sidepanel #profile .wrap i.expand-button {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #profile .wrap i.expand-button {
+    display: none;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options {
+    width: 58px;
+    margin-top: 57px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options.active {
+    margin-top: 62px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options:before {
+    margin-left: 23px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options ul li {
+    padding: 15px 0 35px 22px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options ul li span.status-circle {
+    width: 14px;
+    height: 14px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options ul li span.status-circle:before {
+    height: 18px;
+    width: 18px;
+}
+
+#frame.call #sidepanel #profile .wrap #status-options ul li p {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #profile .wrap #status-options ul li p {
+    display: block;
+}
+
+#frame.call #sidepanel #search {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #search {
+    display: block;
+}
+
+#frame.call #sidepanel #contacts {
+    height: calc(100% - 149px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#frame.call #sidepanel #contacts::-webkit-scrollbar {
+    display: none;
+}
+
+#frame.call #sidepanel #contacts ul li.contact {
+    padding: 6px 0 46px 8px;
+}
+
+#frame.call #sidepanel.hover #contacts ul li.contact {
+    padding: 10px 5px 15px 5px;
+}
+
+#frame.call #sidepanel #contacts ul li.contact .wrap {
+    width: 100%;
+}
+
+#frame.call #sidepanel #contacts ul li.contact .wrap img {
+    margin-right: 0;
+}
+
+#frame.call #sidepanel #contacts ul li.contact .wrap .meta {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #contacts ul li.contact .wrap .meta {
+    display: block;
+}
+
+#frame.call #sidepanel #bottom-bar button {
+    float: none;
+    width: 100%;
+    padding: 15px 0;
+}
+
+#frame.call #sidepanel.hover #bottom-bar button {
+    float: left;
+    width: 50%;
+}
+
+#frame.call #sidepanel #bottom-bar button:nth-child(1) {
+    border-right: none;
+    border-bottom: 1px solid #2c3e50;
+}
+
+#frame.call #sidepanel #bottom-bar button i {
+    font-size: 1.3em;
+}
+
+#frame.call #sidepanel #bottom-bar button span {
+    display: none;
+}
+
+#frame.call #sidepanel.hover #bottom-bar button span {
+    display: block;
+}
+
+#frame.call .content {
+    width: calc(100% - 58px);
+    max-width: 500px;
+    /*min-width: 400px ;*/
+}
+
+#frame.call .content .messages {
+    max-height: calc(100% - 105px);
+}
+
+#frame.call .content .message-input .wrap input {
+    padding: 15px 32px 16px 8px;
+}
+
+#frame.call .content .message-input .wrap button {
+    padding: 16px 0;
+}
+
+/*endregion call*/
+
+/*region Utilities*/
+.hidden {
+    display: none;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+
+.btn-circle.btn-lg {
+    width: 50px;
+    height: 50px;
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.33;
+    border-radius: 25px;
+}
+
+.btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    font-size: 24px;
+    line-height: 1.33;
+    border-radius: 35px;
+}
+
+.group-button {
+    position: absolute;
+    margin: auto;
+    bottom: 30px;
+}
+
+.media-call {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #444444;
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    vertical-align: top;
+}
+
+video#localVideo {
+    min-width: 200px;
+    width: 20%;
+    height: 20%;
+    margin: 0 20px 20px 0;
+    position: absolute;
+    z-index: 2;
+    top: 10px;
+    right: 10px;
+}
+
+@media screen and (max-width: 400px) {
+    /*button {*/
+    /*    width: 83px;*/
+    /*    margin: 0 11px 10px 0;*/
+    /*}*/
+
+    video {
+        height: 90px;
+        margin: 0 0 10px 0;
+        width: calc(50% - 7px);
+    }
+
+    video#localVideo {
+        margin: 0 10px 20px 0;
+    }
+
+}
+
+
+@media screen and (max-height: 450px) {
+    .media-call {padding-top: 15px;}
+    .media-call a {font-size: 18px;}
+}
+
+/*endregion*/
+
+/*region responsive*/
+@media screen and (max-width: 768px) {
     #frame #sidepanel {
         width: 58px;
         min-width: 58px;
+        transition: all .25s;
+    }
+
+    #frame #sidepanel.hover {
+        min-width: 280px;
+        max-width: 340px;
+        width: 80%;
     }
 
     #frame #sidepanel #profile {
@@ -645,7 +915,15 @@ body {
         display: none;
     }
 
+    #frame #sidepanel.hover #profile .wrap p {
+        display: block;
+    }
+
     #frame #sidepanel #profile .wrap i.expand-button {
+        display: none;
+    }
+
+    #frame #sidepanel.hover #profile .wrap i.expand-button {
         display: none;
     }
 
@@ -680,8 +958,16 @@ body {
         display: none;
     }
 
+    #frame #sidepanel.hover #profile .wrap #status-options ul li p {
+        display: block;
+    }
+
     #frame #sidepanel #search {
         display: none;
+    }
+
+    #frame #sidepanel.hover #search {
+        display: block;
     }
 
     #frame #sidepanel #contacts {
@@ -698,6 +984,10 @@ body {
         padding: 6px 0 46px 8px;
     }
 
+    #frame #sidepanel.hover #contacts ul li.contact {
+        padding: 10px 5px 15px 5px;
+    }
+
     #frame #sidepanel #contacts ul li.contact .wrap {
         width: 100%;
     }
@@ -710,15 +1000,23 @@ body {
         display: none;
     }
 
+    #frame #sidepanel.hover #contacts ul li.contact .wrap .meta {
+        display: block;
+    }
+
     #frame #sidepanel #bottom-bar button {
         float: none;
         width: 100%;
         padding: 15px 0;
     }
 
+    #frame #sidepanel.hover #bottom-bar button {
+        float: left;
+        width: 50%;
+    }
+
     #frame #sidepanel #bottom-bar button:nth-child(1) {
-        border-right: none;
-        border-bottom: 1px solid #2c3e50;
+        border: none;
     }
 
     #frame #sidepanel #bottom-bar button i {
@@ -729,20 +1027,26 @@ body {
         display: none;
     }
 
+    #frame.call .content {
+        display: none;
+    }
+
+    #frame #sidepanel.hover #bottom-bar button span {
+        display: block;
+    }
+
     #frame .content {
         width: calc(100% - 58px);
-        min-width: 300px !important;
+        min-width: 200px !important;
     }
 
     #frame .content .messages {
         max-height: calc(100% - 105px);
     }
 
-    #frame .content .message-input .wrap input {
-        padding: 15px 32px 16px 8px;
-    }
-
     #frame .content .message-input .wrap button {
-        padding: 16px 0;
+        padding: 12px 0;
     }
 }
+
+/*endregion responsive*/

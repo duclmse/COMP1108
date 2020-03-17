@@ -1,10 +1,13 @@
 const sqlite = require("sqlite3");
 const bcrypt = require("bcryptjs");
 const fs = require('fs');
+const database = require("./database");
 
 const initialization = {
-    importMockData: (mockFile, database) => {
-        const db = new sqlite.Database(database);
+    importMockData: (mockFile) => {
+        const db = database();
+        const mem = database(":memory:");
+
         fs.readFile(mockFile, 'utf8', (err, contents) => {
             if (err) {
                 return console.log(err);
@@ -13,7 +16,7 @@ const initialization = {
             const tables = ["RelationshipTypes", "Users", "Relationships", "Chats", "ChatMembers", "Messages"];
             tables.forEach(table => {
                 if (data.hasOwnProperty(table)) {
-                    processData(db, table, data[table]);
+                    processData(db, mem, table, data[table]);
                 }
             });
             db.close()
@@ -21,7 +24,7 @@ const initialization = {
     }
 };
 
-const processData = (db, tableName, table) => {
+const processData = (db, mem, tableName, table) => {
     const {create, cols, data, update, each} = table;
 
     db.run(create, [], (err) => {
@@ -83,5 +86,4 @@ const insertData = (db, table, columns, data, each) => {
     console.log(`Done!`);
 };
 
-// initialization.importMockData('../db/mock_data.json')
 module.exports = initialization;
